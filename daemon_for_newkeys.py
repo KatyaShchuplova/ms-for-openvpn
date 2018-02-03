@@ -61,8 +61,8 @@ def main():
             for row in cursor:
                 try:
                     print(row)
-                    login = get_login_on_id(connection, row['ownerId'])
-                    port = get_port_on_id(connection, row['ownerId'])
+                    login = get_login_on_id(connection, row['owner_id'])
+                    port = get_port_on_id(connection, row['owner_id'])
                     print('login_after = %s' % login)
                     new_key = get_key_as_list(login)
                     print('After Key created!')
