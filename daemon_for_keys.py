@@ -43,16 +43,16 @@ def run_command(command):
     return key
 
 
-def get_key_as_list(name):
+def get_key_as_list(name, key_name):
     ovpn_data = "ovpn-data-" + name
-    #os.system('docker run -v %s:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full CLIENTNAME nopass' % ovpn_data)
-    command_create_key = 'docker run -v %s:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient CLIENTNAME' % ovpn_data
+    os.system('docker run -v %s:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full %s nopass' % (ovpn_data, key_name))
+    command_create_key = 'docker run -v %s:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient %s' % (ovpn_data, key_name)
     key = run_command(command_create_key)
     print('key created!')
     return key
 
 
-def main():
+def create_new_key():
     connection = get_connection()
     try:
         with connection.cursor() as cursor:
@@ -64,7 +64,7 @@ def main():
                     login = get_login_on_id(connection, row['owner_id'])
                     port = get_port_on_id(connection, row['owner_id'])
                     print('login_after = %s' % login)
-                    new_key = get_key_as_list(login)
+                    new_key = get_key_as_list(login, row['unique_name'])
                     print('After Key created!')
                     print(type(new_key))
                     key_in_db = ''
@@ -87,6 +87,34 @@ def main():
                     print("fail")
     finally:
         connection.close()
+
+
+def revoke_key():
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql_select = "SELECT * FROM `keys` WHERE status like 'delete' and is_revoked like '0'"
+            cursor.execute(sql_select)
+            for row in cursor:
+                try:
+                    print(row)
+                    login = get_login_on_id(connection, row['owner_id'])
+                    port = get_port_on_id(connection, row['owner_id'])
+                    ovpn_data = "ovpn-data-" + login
+                    os.system('docker run --rm -it -v %s:/etc/openvpn kylemanna/openvpn ovpn_revokeclient %s' % (ovpn_data, row['unique_name']))
+                    sql_update_is_retrieved = "Update `keys` SET is_retrieved = True WHERE id = %d" % row['id']
+                    cursor.execute(sql_update_is_retrieved)
+                    connection.commit()
+                    print("Key is retrieved")
+                except:
+                    print("fail")
+    finally:
+        connection.close()
+
+
+def main():
+    create_new_key()
+    revoke_key()
 
 
 if __name__ == '__main__':
