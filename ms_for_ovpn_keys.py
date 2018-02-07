@@ -3,7 +3,7 @@ import pymysql
 import shlex
 import subprocess
 
-PATH_MS_CONTINUE_FLAG = 'ms_continue_flag'
+PATH_MS_CONTINUE_FLAG = 'ms_keys_continue_flag'
 
 def get_connection():
     connection = pymysql.connect(host='192.168.0.61', user='admin', password='admin', db='openvpn',

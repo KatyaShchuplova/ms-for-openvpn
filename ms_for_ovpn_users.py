@@ -1,7 +1,7 @@
 import os
 import pymysql
 
-PATH_MS_CONTINUE_FLAG = 'ms_continue_flag'
+PATH_MS_CONTINUE_FLAG = 'ms_users_continue_flag'
 
 
 def get_connection():
