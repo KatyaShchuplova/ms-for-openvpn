@@ -1,6 +1,8 @@
 import os
 import pymysql
 
+PATH_MS_CONTINUE_FLAG = 'ms_continue_flag'
+
 
 def get_connection():
     connection = pymysql.connect(host='192.168.0.61', user='admin', password='admin', db='openvpn',
@@ -30,21 +32,28 @@ def create_docker(name, port):
 
 
 def main():
-    connection = get_connection()
-    try:
-        with connection.cursor() as cursor:
-            sql_select = "SELECT * FROM users WHERE vpnCreated = False LIMIT 1"
-            cursor.execute(sql_select)
-            for row in cursor:
-                try:
-                    create_docker(row['login'], row['port'])
-                    sql_update = "Update users SET vpnCreated = 1 WHERE id = %d " % (row['id'])
-                    cursor.execute(sql_update)
-                    connection.commit()
-                except:
-                    print("docker wasn't created")
-    finally:
-        connection.close()
+    while True:
+        with open(PATH_MS_CONTINUE_FLAG, "r") as file:
+            for line in file:
+                if "#" in line:
+                    continue
+                if "Stop" in line:
+                    exit()
+        connection = get_connection()
+        try:
+            with connection.cursor() as cursor:
+                sql_select = "SELECT * FROM users WHERE vpnCreated = False LIMIT 1"
+                cursor.execute(sql_select)
+                for row in cursor:
+                    try:
+                        create_docker(row['login'], row['port'])
+                        sql_update = "Update users SET vpnCreated = 1 WHERE id = %d " % (row['id'])
+                        cursor.execute(sql_update)
+                        connection.commit()
+                    except:
+                        print("docker wasn't created")
+        finally:
+            connection.close()
 
 
 if __name__ == '__main__':
