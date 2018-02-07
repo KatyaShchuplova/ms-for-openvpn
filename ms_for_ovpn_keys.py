@@ -114,15 +114,8 @@ def revoke_key():
 
 
 def main():
-    while True:
-        with open(PATH_MS_CONTINUE_FLAG, "r") as file:
-            for line in file:
-                if "#" in line:
-                    continue
-                if "Stop" in line:
-                    exit()
-        create_new_key()
-        revoke_key()
+    create_new_key()
+    revoke_key()
 
 
 if __name__ == '__main__':
