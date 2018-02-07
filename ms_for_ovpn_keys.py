@@ -103,7 +103,7 @@ def revoke_key():
                     port = get_port_on_id(connection, row['owner_id'])
                     ovpn_data = "ovpn-data-" + login
                     os.system('docker run --rm -it -v %s:/etc/openvpn kylemanna/openvpn ovpn_revokeclient %s' % (ovpn_data, row['unique_name']))
-                    sql_update_is_retrieved = "Update `keys` SET is_retrieved = True WHERE id = %d" % row['id']
+                    sql_update_is_retrieved = "Update `keys` SET is_revoked = True WHERE id = %d" % row['id']
                     cursor.execute(sql_update_is_retrieved)
                     connection.commit()
                     print("Key is retrieved")
