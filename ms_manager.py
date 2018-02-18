@@ -1,6 +1,6 @@
 import os
 
-PATH_MS_CONTINUE_FLAG = 'ms_keys_continue_flag'
+PATH_MS_CONTINUE_FLAG = 'ms_manager_continue_flag'
 
 
 def main():

@@ -1,8 +1,6 @@
 import os
 import pymysql
 
-PATH_MS_CONTINUE_FLAG = 'ms_users_continue_flag'
-
 
 def get_connection():
     connection = pymysql.connect(host='192.168.0.61', user='admin', password='admin', db='openvpn',
@@ -28,7 +26,7 @@ def create_docker(name, port):
         os.system(
             'docker run -v %s:/etc/openvpn -d -p %d:1194/udp --cap-add=NET_ADMIN kylemanna/openvpn' % (OVPN_DATA, port))
     except:
-        print("docker wasn't created")
+        print("Error. Docker wasn't created")
 
 
 def main():
@@ -44,7 +42,7 @@ def main():
                     cursor.execute(sql_update)
                     connection.commit()
                 except:
-                    print("docker wasn't created")
+                    print("Error. Docker wasn't created")
     finally:
         connection.close()
 
